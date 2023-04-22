@@ -14,7 +14,7 @@ class Database:
     load_dotenv()
 
     def _collection(self) -> collection:
-        "Connect to the database and return the required collection."
+        "Connect to the database and return the relivent collection."
 
         URI = getenv("DB_URI", None)
         NAME = getenv("DB_NAME", None)
@@ -25,8 +25,12 @@ class Database:
                              tlsCAFile=where())
         return client[NAME][COLLECTION]
 
-    def seed(self, amount: int):
-        "Inserts a given amount of random Monster entries into the database."
+    def seed(self, amount: int) -> None:
+        """Insert a given amount of random Monster entries into the database.
+
+        Keyword arguments:
+        amount -- the integer amount of entries to add (must be greater than 1)
+        """
 
         if not isinstance(amount, int):
             raise TypeError('can only use int (not "{}") values for the '
@@ -38,23 +42,23 @@ class Database:
         monsters = iter(Monster().to_dict() for _ in range(amount))
         self._collection().insert_many(monsters)
 
-    def reset(self):
-        "Drops all records in the database."
+    def reset(self) -> None:
+        "Drop all records in the database."
         self._collection().drop()
 
     def count(self) -> int:
-        "Count of entries recorded in the database."
+        "Count the entries recorded in the database."
         return self._collection().count_documents({})
 
     def dataframe(self) -> DataFrame:
-        "Creates a dataframe object of the whole database."
+        "Create a dataframe object from the whole database."
         data = self._collection().find({})
         df = DataFrame(data)
         df.drop(columns=["_id"], inplace=True)
         return df
 
     def html_table(self) -> str:
-        "Creates an HTML table of the whole database, returns None if empty."
+        "Create an HTML table from the whole database, returns None if empty."
         df = self.dataframe()
 
         if df.empty:
