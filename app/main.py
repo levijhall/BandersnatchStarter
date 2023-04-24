@@ -7,10 +7,10 @@ from flask import Flask, render_template, request
 from pandas import DataFrame
 
 from app.data import Database
-from app.graph import chart
+from app.graph import figure
 from app.machine import Machine
 
-SPRINT = 1
+SPRINT = 2
 APP = Flask(__name__)
 
 
@@ -45,7 +45,7 @@ def view():
     x_axis = request.values.get("x_axis") or options[1]
     y_axis = request.values.get("y_axis") or options[2]
     target = request.values.get("target") or options[4]
-    graph = chart(
+    graph = figure(
         df=db.dataframe(),
         x=x_axis,
         y=y_axis,
