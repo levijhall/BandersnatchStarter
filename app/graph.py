@@ -13,13 +13,16 @@ def figure(df: DataFrame, x: str, y: str, target: str) -> Figure:
     target -- the name of the variable to group each point onto a color.
     """
 
-    df.sort_values([x, y, target], axis=0, inplace=True)
-    title = ''.join([y, "by", x, "for", target])
+    title = ' '.join([y, "by", x, "for", target])
+    category_order = {"Rarity": ["Rank 0", "Rank 1", "Rank 2",
+                                 "Rank 3", "Rank 4", "Rank 5"]}
 
     fig = px.scatter(df, x=x, y=y, color=target,
                      title=title,
                      hover_data=df,
-                     template='plotly_dark')
+                     template='plotly_dark',
+                     width=500, height=500,
+                     category_orders=category_order)
 
     fig.update_layout(
         font_color="#aaaaaa",
@@ -32,7 +35,8 @@ def figure(df: DataFrame, x: str, y: str, target: str) -> Figure:
             font_color="white",
             bgcolor="#2b2b2b",
             font_size=12,
-            font_family="Monaco, sans-serif"
+            font_family="Monaco, sans-serif",
+            align="auto"
         )
     )
 
