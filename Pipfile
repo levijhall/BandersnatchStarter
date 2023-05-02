@@ -20,6 +20,9 @@ python-dotenv = "*"
 scikit-learn = "*"
 scipy = "*"
 plotly = "*"
+xgboost = "*"
+seaborn = "*"
+statsmodels = "*"
 
 [dev-packages]
 flake8 = "*"
