@@ -3,6 +3,12 @@
     <h1>Bandersnatch Model</h1>
     <p>{{ info | safe }}</p>
 
+    <form method="post" action="{{ url_for('download') }}">
+        <p><label>
+            With data: <button type="submit">Download</button>
+        </label></p>
+    </form>
+
     <h2>Prediction Basis</h2>
     <form id="form" method="post" action="{{ url_for('model') }}">
         <p><label>
@@ -20,6 +26,11 @@
         <p><label>
             Sanity: <input name="sanity" value="{{ sanity }}"/>
         </label></p>
+        <br class="clear">
+        <p><label>
+            Retrain: 
+        </label></p>
+        <input type="checkbox" class="checkbox" name="retrain" value="True"/>
         <br class="clear">
         <button type="submit">Predict Rarity</button>
         <br class="clear">

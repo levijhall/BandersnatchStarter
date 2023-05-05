@@ -1,6 +1,22 @@
 {% extends "layout.html" %}
 {% block content %}
     <h1>Bandersnatch Data</h1>
+    <form method="post" action="{{ url_for('data') }}">
+        <p><label>Amount:
+            <select name="amount">
+                {% for op in options %}
+                    {% if op == amount %}
+                        <option selected="selected">{{ op }}</option>
+                    {% else %}
+                        <option>{{ op }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </label></p>
+        <br class="clear">
+        <button type="submit">Reseed Database</button>
+        <br class="clear">
+    </form>
     <p>Monster Count: {{ count | safe }}</p>
     {{ table | safe }}
 {% endblock %}

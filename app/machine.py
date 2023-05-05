@@ -25,7 +25,7 @@ class Machine:
         y = df[target].values.ravel()
 
         self._name = "Random Forest Classifier"
-        rfc = RandomForestClassifier(max_features=None)
+        rfc = RandomForestClassifier(max_features=None, n_estimators=200)
         rfc.fit(X, y)
 
         self._model = rfc
@@ -45,8 +45,6 @@ class Machine:
         '''
         pred = self._model.predict_proba(feature_basis)[0]
         index = argmax(pred)
-
-        print(pred)
 
         return self._model.classes_[index], pred[index]
 

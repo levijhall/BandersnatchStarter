@@ -161,6 +161,11 @@ form input {
     float: right;
 }
 
+form input.checkbox  {
+    width: 175px;
+    float: left;
+}
+
 form select {
     width: 164px;
     margin: 2px 20px 5px 5px;
