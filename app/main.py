@@ -4,7 +4,7 @@ import os
 from Fortuna import random_int, random_float
 from MonsterLab import Monster
 from flask import Flask, render_template, request, send_file
-from pandas import DataFrame
+from pandas import DataFrame, merge
 from zipfile import ZipFile, ZIP_DEFLATED
 from joblib import dump
 from io import BytesIO
@@ -117,13 +117,16 @@ def download():
     model_path = os.path.join("app/temp", "rfc.joblib")
     csv_path = os.path.join("app/temp", "monsters.csv")
 
-    model = None
-    if os.path.exists(machine_path):
-        machine = Machine.open(machine_path)
-        model = dump(machine._model, model_path)
+    machine = Machine.open(machine_path)
+    model = dump(machine._model, model_path)
 
     db = Database()
-    db.dataframe().to_csv(csv_path)
+    df = db.dataframe()
+
+    df_feat = machine.make_features(df)
+    df_merged = merge(left=df, right=df_feat, how='outer',
+                      right_index=True, left_index=True)
+    df_merged.to_csv(csv_path)
 
     memory_file = BytesIO()
     with ZipFile(memory_file, 'w', ZIP_DEFLATED) as zf:

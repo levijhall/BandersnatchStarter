@@ -119,4 +119,5 @@ dmypy.json
 .pytype/
 cython_debug/
 .vscode
-app/model.joblib
+app/*.joblib
+app/temp/

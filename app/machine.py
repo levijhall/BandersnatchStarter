@@ -1,5 +1,5 @@
 from pandas import DataFrame
-from numpy import argmax
+from numpy import argmax, std
 from sklearn.ensemble import RandomForestClassifier
 from joblib import dump, load
 from datetime import datetime
@@ -18,14 +18,25 @@ class Machine:
         df -- The DataFrame object containing all the values to be trained off
         of. Must contain columns for Energy, Health, Sanity, Level, and Rarity.
         '''
-        features = ['Level', 'Health', 'Energy', 'Sanity']
-        target = 'Rarity'
+        z = df[
+            ['Rarity', 'Level', 'Health', 'Energy', 'Sanity']
+            ].groupby(
+            ['Rarity', 'Level']
+            ).aggregate(std).reset_index()
+        z_mean = z[
+            ['Rarity', 'Health', 'Energy', 'Sanity']
+            ].groupby(
+            ['Rarity']
+            ).mean()
+        self.z_mean = z_mean
 
-        X = df[features]
-        y = df[target].values.ravel()
+        X = self.make_features(df)
+        y = df['Rarity'].values.ravel()
 
         self._name = "Random Forest Classifier"
-        rfc = RandomForestClassifier(max_features=None, n_estimators=200)
+        rfc = RandomForestClassifier(max_features=None,
+                                     n_estimators=300,
+                                     max_depth=10)
         rfc.fit(X, y)
 
         self._model = rfc
@@ -43,7 +54,9 @@ class Machine:
         The name of the class predicted, and the probability
         infered from the model.
         '''
-        pred = self._model.predict_proba(feature_basis)[0]
+
+        df_feat = self.make_features(feature_basis)
+        pred = self._model.predict_proba(df_feat)[0]
         index = argmax(pred)
 
         return self._model.classes_[index], pred[index]
@@ -70,3 +83,35 @@ class Machine:
         time = "Timestamp: " + self._timestamp
 
         return '<br>'.join([title, time])
+
+    def make_features(self, df: DataFrame) -> DataFrame:
+        '''Generate the engineered features.
+
+        Keyword arguments:
+        df -- the DataFrame containing the values for Rarity, Health, Energy,
+        Sanity, and Level.
+
+        Returns:
+        A DataFrame containing several additional columns for Health, Energy,
+        and Sanity, suffixed with _z_(r) where 'r' corresponds with the
+        Rarity Rank number and is calculated to be the standard deviation away
+        from the mean value for a monster of that Level and Rarity.
+        '''
+
+        df_feat = DataFrame()
+        df_feat['Level'] = df['Level']
+
+        ranks = [0, 1, 2, 3, 4, 5]
+        params = ['Health', 'Energy', 'Sanity']
+        new_features = []
+
+        for param in params:
+            for rank in ranks:
+                name = param + "_z_" + str(rank)
+                new_features.append(name)
+                lookup = self.z_mean[param].to_dict()
+
+                df_feat[name] = abs(df[param] - 2 * df['Level'] * (rank + 1)) \
+                    / lookup['Rank ' + str(rank)]
+
+        return df_feat
