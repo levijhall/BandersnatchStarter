@@ -115,3 +115,7 @@ class Machine:
                     / lookup['Rank ' + str(rank)]
 
         return df_feat
+
+    def dump_model(self, filepath: str):
+        '''Dump the trained model as a joblib to the specified filepath.'''
+        dump(self._model, filepath)

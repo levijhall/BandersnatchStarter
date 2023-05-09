@@ -6,7 +6,6 @@ from MonsterLab import Monster
 from flask import Flask, render_template, request, send_file
 from pandas import DataFrame, merge
 from zipfile import ZipFile, ZIP_DEFLATED
-from joblib import dump
 from io import BytesIO
 
 from app.data import Database
@@ -117,11 +116,17 @@ def download():
     model_path = os.path.join("app/temp", "rfc.joblib")
     csv_path = os.path.join("app/temp", "monsters.csv")
 
-    machine = Machine.open(machine_path)
-    model = dump(machine._model, model_path)
-
     db = Database()
     df = db.dataframe()
+
+    options = ["Level", "Health", "Energy", "Sanity", "Rarity"]
+    if not os.path.exists(machine_path):
+        machine = Machine(df[options])
+        machine.save(machine_path)
+    else:
+        machine = Machine.open(machine_path)
+
+    machine.dump_model(model_path)
 
     df_feat = machine.make_features(df)
     df_merged = merge(left=df, right=df_feat, how='outer',
@@ -131,8 +136,7 @@ def download():
     memory_file = BytesIO()
     with ZipFile(memory_file, 'w', ZIP_DEFLATED) as zf:
         zf.write(csv_path, arcname="monsters.csv")
-        if model:
-            zf.write(model_path, arcname="rfc.joblib")
+        zf.write(model_path, arcname="rfc.joblib")
     memory_file.seek(0)
 
     return send_file(memory_file, mimetype='application/zip',
