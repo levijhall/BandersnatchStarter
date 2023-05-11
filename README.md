@@ -2,7 +2,7 @@
 
 Read the Documentation for information on how to get started.
 
-[Deployed App](https://bandersnatch.herokuapp.com)
+[Deployed App](http://lab.levihall.com)
 
 
 ### Tech Stack
